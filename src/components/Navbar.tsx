@@ -26,12 +26,18 @@ export default function Navbar() {
               Dashboard
             </button>
           </Link>
+          <Link href="/kanban">
+  <button className="px-5 py-2.5 rounded-xl border border-indigo-200 bg-indigo-50 text-indigo-600 font-medium hover:bg-indigo-100 transition-all duration-300">
+    Kanban
+  </button>
+</Link>
 
           <Link href="/create-task">
             <button className="px-5 py-2.5 rounded-xl border border-indigo-200 bg-indigo-50 text-indigo-600 font-medium hover:bg-indigo-100 transition-all duration-300">
               Create Task
             </button>
           </Link>
+          
 
           <div className="w-11 h-11 rounded-full bg-indigo-50 border border-indigo-200 flex items-center justify-center text-indigo-600 text-lg font-semibold cursor-pointer hover:bg-indigo-100 transition-all duration-300">
             👤

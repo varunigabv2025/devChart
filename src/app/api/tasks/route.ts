@@ -3,29 +3,29 @@ import Task from "@/models/Tasks";
 
 export async function GET() {
   try {
+    console.log("GET API HIT");
+
     await connectDB();
 
-    const tasks = await Task.find().sort({
-      createdAt: -1,
-    });
+    console.log("DB CONNECTED");
 
-    return Response.json(tasks, {
-      status: 200,
-    });
+    const tasks = await Task.find({});
+
+    console.log("TASKS:", tasks);
+
+    return Response.json(tasks);
   } catch (error) {
-    console.error(error);
+    console.error("GET ERROR:", error);
 
     return Response.json(
       {
         message: "Failed to fetch tasks",
+        error: String(error),
       },
-      {
-        status: 500,
-      }
+      { status: 500 }
     );
   }
 }
-
 export async function POST(request: Request) {
   try {
     await connectDB();
