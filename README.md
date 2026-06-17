@@ -140,6 +140,8 @@ MONGODB_URI=your_mongodb_connection_string
 The application will be available through a Vercel deployment URL.
 
 ---
+6.🔗 Live Website:🔗 Live Website: https://dev-chart.vercel.app
+---
 
 ## 📸 Screenshots of Working Website
 
