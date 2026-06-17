@@ -26,7 +26,7 @@ export default function Home() {
 const [roleFilter, setRoleFilter] =
   useState("all");
   const [editingTask, setEditingTask] =
-  useState<Task | null>(null);
+  useState<any>(null);
   const [editTitle, setEditTitle] =
   useState("");
 
@@ -52,37 +52,74 @@ const [
     }
   }
 
-  async function handleDelete(id: string) {
-    try {
-      await fetch(`/api/tasks/${id}`, {
+ async function handleDelete(id: string) {
+  try {
+    const response = await fetch(
+      `/api/tasks/${id}`,
+      {
         method: "DELETE",
-      });
+      }
+    );
 
-      fetchTasks();
-    } catch (error) {
-      console.error(error);
+    if (!response.ok) {
+      alert("Delete Failed");
+      return;
     }
-  }
 
-  async function handleStatusChange(
-    id: string,
-    status: "todo" | "inprogress" | "done"
-  ) {
-    try {
-      await fetch(`/api/tasks/${id}`, {
+    setTasks((prev: any) =>
+      prev.filter(
+        (task: any) =>
+          task._id !== id
+      )
+    );
+  } catch (error) {
+    console.error(error);
+  }
+}
+async function handleStatusChange(
+  id: string,
+  status:
+    | "todo"
+    | "inprogress"
+    | "done"
+) {
+  try {
+    const response = await fetch(
+      `/api/tasks/${id}`,
+      {
         method: "PATCH",
         headers: {
-          "Content-Type": "application/json",
+          "Content-Type":
+            "application/json",
         },
-        body: JSON.stringify({ status }),
-      });
+        body: JSON.stringify({
+          status,
+        }),
+      }
+    );
 
-      fetchTasks();
-    } catch (error) {
-      console.error(error);
+    if (!response.ok) {
+      alert(
+        "Status Update Failed"
+      );
+      return;
     }
-  }
 
+    setTasks((prev) =>
+      prev.map(
+        (task: any) =>
+          task._id === id
+            ? {
+                ...task,
+                status,
+              }
+            : task
+      )
+    );
+  } catch (error) {
+    console.error(error);
+  }
+}
   useEffect(() => {
     fetchTasks();
   }, []);
@@ -138,10 +175,57 @@ const [
     );
   }
 );
+async function handleUpdateTask() {
+  try {
+    const response = await fetch(
+      `/api/tasks/${editingTask._id}`,
+      {
+        method: "PATCH",
+        headers: {
+          "Content-Type":
+            "application/json",
+        },
+        body: JSON.stringify({
+          title: editTitle,
+          description:
+            editDescription,
+          priority:
+            editPriority,
+        }),
+      }
+    );
 
+    if (!response.ok) {
+      alert("Update Failed");
+      return;
+    }
+
+    const updatedTask =
+      await response.json();
+
+    setTasks((prev) =>
+      prev.map((task: any) =>
+        task._id ===
+        updatedTask._id
+          ? updatedTask
+          : task
+      )
+    );
+
+    setEditingTask(null);
+
+    alert("Task Updated");
+  } catch (error) {
+    console.error(error);
+    alert("Update Failed");
+  }
+}
   return (
     <>
       <Navbar />
+     
+     
+   
       
    
       <div className="min-h-screen bg-gradient-to-br from-indigo-200 via-purple-100 to-cyan-100 p-8">
@@ -222,19 +306,7 @@ const [
 )}
 
 
-          {/* Announcement */}
-          <div className="bg-gradient-to-r from-indigo-600 to-purple-600 text-white rounded-3xl shadow-xl p-7 mb-8">
-
-            <h2 className="text-2xl font-bold mb-2">
-              📢 Club Announcement
-            </h2>
-
-            <p>
-              AI Workshop scheduled on June 20.
-              Complete assigned tasks before the event.
-            </p>
-
-          </div>
+          
 
           {/* Tasks */}
           <div className="bg-white rounded-3xl shadow-xl p-6">
@@ -326,11 +398,14 @@ const [
   role={task.role}
   onDelete={handleDelete}
   onStatusChange={handleStatusChange}
- onEdit={(id) => {
+onEdit={(id) => {
+ 
   const taskToEdit =
     tasks.find(
       (t) => t._id === id
     );
+
+ 
 
   if (taskToEdit) {
     setEditingTask(
@@ -359,7 +434,86 @@ const [
           </div>
 
         </div>
-      </div>
+           </div>
+
+      {editingTask && (
+        <div className="fixed inset-0 z-[99999] bg-black/50 backdrop-blur-sm flex items-center justify-center p-4">
+
+          <div className="bg-white rounded-3xl p-8 w-full max-w-xl shadow-2xl">
+
+            <h2 className="text-2xl font-bold mb-6">
+              Edit Task
+            </h2>
+
+            <input
+              type="text"
+              value={editTitle}
+              onChange={(e) =>
+                setEditTitle(e.target.value)
+              }
+              className="w-full p-3 border rounded-xl mb-4"
+            />
+
+            <textarea
+              value={editDescription}
+              onChange={(e) =>
+                setEditDescription(
+                  e.target.value
+                )
+              }
+              rows={4}
+              className="w-full p-3 border rounded-xl mb-4"
+            />
+
+            <select
+              value={editPriority}
+              onChange={(e) =>
+                setEditPriority(
+                  e.target.value
+                )
+              }
+              className="w-full p-3 border rounded-xl mb-6"
+            >
+              <option value="low">
+                Low
+              </option>
+              <option value="medium">
+                Medium
+              </option>
+              <option value="high">
+                High
+              </option>
+            </select>
+
+            <div className="flex gap-3">
+
+              <button
+                onClick={
+                  handleUpdateTask
+                }
+                className="flex-1 bg-indigo-600 text-white py-3 rounded-xl"
+              >
+                Save Changes
+              </button>
+
+              <button
+                onClick={() =>
+                  setEditingTask(
+                    null
+                  )
+                }
+                className="flex-1 bg-slate-200 py-3 rounded-xl"
+              >
+                Cancel
+              </button>
+
+            </div>
+
+          </div>
+
+        </div>
+      )}
+
     </>
   );
 }

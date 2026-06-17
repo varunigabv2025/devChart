@@ -31,6 +31,12 @@ export default function TaskCard({
   onEdit,
   onStatusChange,
 }: TaskCardProps) {
+
+  const currentRole =
+    typeof window !== "undefined"
+      ? localStorage.getItem("role")
+      : null;
+
   const badgeClass =
     priority.toLowerCase() === "high"
       ? "bg-red-100 text-red-600"
@@ -145,19 +151,27 @@ export default function TaskCard({
           </button>
         )}
 
-        <button
-          onClick={() => onEdit?.(id)}
-          className="bg-yellow-500 text-white px-4 py-2 rounded-xl hover:bg-yellow-600 transition"
-        >
-          ✏️
-        </button>
+        {currentRole === "admin" && (
+          <button
+            onClick={() =>
+              onEdit?.(id)
+            }
+            className="bg-yellow-500 text-white px-4 py-2 rounded-xl hover:bg-yellow-600 transition"
+          >
+            ✏️
+          </button>
+        )}
 
-        <button
-          onClick={() => onDelete?.(id)}
-          className="bg-red-500 text-white px-4 py-2 rounded-xl hover:bg-red-600 transition"
-        >
-          🗑
-        </button>
+        {currentRole === "admin" && (
+          <button
+            onClick={() =>
+              onDelete?.(id)
+            }
+            className="bg-red-500 text-white px-4 py-2 rounded-xl hover:bg-red-600 transition"
+          >
+            🗑
+          </button>
+        )}
 
       </div>
 
